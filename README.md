@@ -26,7 +26,7 @@ Python ('cause QGIS has a python API)
 - [ ] Make a robust visualisation enabling the user to input the start and the end-points of the trajectory and generate a trajectory.
 
 ## Extras (to get brownie points)
-- [ ] Make a 3D surface visualiser to make the robot traverse it (like a game)
+- [ ] Make a 3D surface visualiser to make the robot traverse it (like a game). A gaebo simulation like thingy.
 
 ## Some important points to note:
 1. I would rather get more marks if I talk about keywords and terminologies than if I do great work. That is how the course spatial informatics is.
