@@ -6,6 +6,9 @@ Optimal Trajectory Planning for a Mars Rover Using Spatial Data collected by Mar
 ## Programming Language
 Python ('cause QGIS has a python API)
 
+## Goal
+Make it as easy as possible but as convincing and possible.
+
 ## Things to complete before mid-evaluation (4th November, 2024)
 - [ ] Write Down assumptions / criteria
 - [ ] Data – Source, Characteristics (in as much detail as possible)
