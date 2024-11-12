@@ -34,3 +34,11 @@ Make it as easy as possible but as convincing and possible.
 ## Some important points to note:
 1. I would rather get more marks if I talk about keywords and terminologies than if I do great work. That is how the course spatial informatics is.
 2. Focus on terms and keywords and references. Especially to the slides.
+
+## Things completed till mid-evaluation
+1. Explored Mars CRS
+2. Went with the MOLA dataset first but then the problems (show calculations)
+3. Then I went with specific HiRISE dataset that seemed to work after many problems.
+   - Convting the .img file to a .tiff file
+   - Then georeferencing it (how did I do so?)
+   - Then performing r.walk.rast to get the cummulative cost and the movement directions from any point
