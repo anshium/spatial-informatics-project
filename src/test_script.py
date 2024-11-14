@@ -10,6 +10,11 @@ import matplotlib.pyplot as plt
 
 import pickle
 
+import pybullet as p
+import pybullet_data
+import time
+
+
 class Graph:
     def __init__(self, connections, directed=False):
         self._graph = defaultdict(dict)
@@ -94,6 +99,10 @@ def test_graph():
 
 
 def path_planner():
+    p.connect(p.GUI)
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.setGravity(0, 0, -9.81)
+    
     
     #+-+-+-+-+-+-+-+-+-+-+-+- Open the dtm as a raster image +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
     DATASETS_PATH = "datasets"
@@ -124,95 +133,42 @@ def path_planner():
     
     img_normalized = ((img_clipped - min_val) / (max_val - min_val) * 255).astype(np.uint8)
     
-    x_start, y_start = 1000, 1000
-    x_end, y_end = 1070, 1070
+    x_start, y_start = 2200, 3600
+    x_end, y_end = 2800, 4200
     img_cropped = img_normalized[y_start:y_end, x_start:x_end]
     
-    print(np.mean(img_normalized))
+    # print(img_cropped[200][300])
     
-    plt.imshow(img_cropped)
+    # plt.imshow(img_cropped)
     # plt.savefig('Cropped_Tiff.png')
-    plt.show()
+    # plt.show()
     
-    #+-+-+-+-+-+-+-+-+- Make a graph of the raster with costs based on just the elevation values +-+-+-+-+-+-+-+-+-
-    # coordinate_2_index = [25, 25]
-    # print(img_cropped[coordinate_2_index[0], coordinate_2_index[1]])
+    img_cropped = img_cropped[:, :, :1]
     
-    
-    rows, cols, _ = img_cropped.shape
-    
-    connections = []
-    
-    indices = np.indices((rows, cols)).reshape(2, -1).T
-    
-    print(len(indices))
-
-    for coordinate_1 in range(len(indices)):
-        for coordinate_2 in range(len(indices)):
-            if(coordinate_1 == coordinate_2):
-                continue
-            
-            coordinate_1_index = indices[coordinate_1]
-            coordinate_2_index = indices[coordinate_2]
-            
-            coordinate_2_weight = img_cropped[coordinate_2_index[0], coordinate_2_index[1]][0]
-            coordinate_1_weight = img_cropped[coordinate_1_index[0], coordinate_1_index[1]][0]
-            
-            connections.append((coordinate_1_index, coordinate_2_index, coordinate_2_weight - coordinate_1_weight))
-
-    dtm_graph = Graph(connections, directed=True)
-
-    print("Graph Created Successfully")
-    
-    dtm_graph.save_graph("small_graph.bin")
-    print(dtm_graph.print_graph())
-    
-    dtm_graph = load_graph("small_graph.bin")
-    
-    start_coordinates = [0, 0]
-    end_coordinates = [30, 30]
-    
-    start_node = [0, 0]
-    end_node = [30, 30]
-    
-    path, cost = dtm_graph.find_shortest_path(start_node, end_node)
-    
-    print(f"Shortest Path from {start_node} to {end_node}: {path}, Total Cost: {cost}")
-    
-    indices = np.indices((rows, cols)).reshape(2, -1).T
-    path_coords = [indices[i] for i in path]
-    
-    print(path_coords)
-    
-    # Plot the image and the path
-    plt.imshow(img_cropped)
-    path_coords = np.array(path_coords)
-    plt.plot(path_coords[:, 1], path_coords[:, 0], marker='o', color='r', markersize=4)
-    plt.title(f"Shortest Path from {start_node} to {end_node}")
-    plt.show()
+    heightmap_data = (img_cropped / img_cropped.max()).flatten()
     
     
-    #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
-    # coords_1 = indices[:, None, :]
-    # coords_2 = indices[None, :, :]
-
-    # weights_1 = img_normalized[coords_1[:, :, 0], coords_1[:, :, 1]]
-    # weights_2 = img_normalized[coords_2[:, :, 0], coords_2[:, :, 1]]
-
-    # weight_diff = weights_2 - weights_1
-
-    # connections = [(i, j, weight_diff[i, j]) for i in range(len(indices)) for j in range(len(indices))]
+    heightmap_data = heightmap_data[:heightmap_data.shape[0]]
     
-    # Include costs for important landmarks. 
-    # Make that as an option where the user can enter as many important landmarks and the graph gets updated
+    print(heightmap_data.shape)
     
-    # Include cost for dangerous sites that need to be avoided (like craters and the like)
-    
-    # Include cost for solar exposure (later)
+    dtm_size = img_cropped.shape[0]
     
     
-    pass
+    terrain_shape = p.createCollisionShape(
+        shapeType=p.GEOM_HEIGHTFIELD,
+        meshScale=[0.1, 0.1, 10],  # Scale x, y, z
+        heightfieldTextureScaling=(dtm_size - 1) / 2,
+        heightfieldData=heightmap_data,
+        numHeightfieldRows=dtm_size,
+        numHeightfieldColumns=dtm_size
+    )
+    
+    terrain_id = p.createMultiBody(0, terrain_shape)
+    
+    while True:
+        p.stepSimulation()
+        time.sleep(1./240.)
 
 def path_planner2():
     
