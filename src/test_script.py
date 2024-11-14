@@ -101,6 +101,7 @@ def test_graph():
 def path_planner():
     p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.resetSimulation()
     p.setGravity(0, 0, -9.81)
     
     
@@ -153,7 +154,7 @@ def path_planner():
     print(heightmap_data.shape)
     
     dtm_size = img_cropped.shape[0]
-    
+    # heightmap_data = np.zeros(dtm_size * dtm_size)
     
     terrain_shape = p.createCollisionShape(
         shapeType=p.GEOM_HEIGHTFIELD,
@@ -163,10 +164,70 @@ def path_planner():
         numHeightfieldRows=dtm_size,
         numHeightfieldColumns=dtm_size
     )
+    print("Here 1")
     
     terrain_id = p.createMultiBody(0, terrain_shape)
+    print("Here 2")
     
-    while True:
+    robot_start_pos = [0, -12, 5]
+    print("Here 3")
+    robot_start_orientation = p.getQuaternionFromEuler([0, 0, 0])  # Initial facing direction
+    print("Here 4")
+    robot_id = p.loadURDF("r2d2.urdf", robot_start_pos, robot_start_orientation, globalScaling=1)
+    print("Here 5")
+    print("Loaded urdf")
+
+
+    waypoints = [
+        [1, 1, 0.5],
+        [2, 2, 0.5],
+        [3, 3, 0.5]
+    ]
+
+    def move_robot_to_waypoint(robot_id, waypoint):
+        current_pos, _ = p.getBasePositionAndOrientation(robot_id)
+        target_vector = np.array(waypoint) - np.array(current_pos[:3])  # Include Z for height consideration
+        
+        # Normalize direction vector
+        target_vector_norm = np.linalg.norm(target_vector)
+        
+        if target_vector_norm > 0:
+            direction = target_vector / target_vector_norm
+        else:
+            direction = np.array([0, 0, 1])
+        
+        # Apply forward velocity based on the direction vector
+        forward_speed = 1.0  # Adjust the speed as needed
+        target_velocity = direction * forward_speed
+        
+        # Apply velocity to the robot base
+        p.resetBaseVelocity(robot_id, target_velocity.tolist())
+        
+        # Optionally, apply rotational torque to steer the robot towards the waypoint
+        current_orientation = p.getBasePositionAndOrientation(robot_id)[1]
+        rotation_matrix = np.array(p.getMatrixFromQuaternion(current_orientation)).reshape(3, 3)
+        
+        # Assume the robot faces along the x-axis in its local frame
+        local_forward = np.array([1, 0, 0])
+        local_forward_rotated = np.dot(rotation_matrix, local_forward)
+        
+        # Compute the angle difference between the robot's current heading and target direction
+        angle_diff = np.arctan2(target_vector[1], target_vector[0]) - np.arctan2(local_forward_rotated[1], local_forward_rotated[0])
+        
+        # Apply torque to turn the robot
+        p.setJointMotorControlArray(robot_id, range(2), p.TORQUE_CONTROL, forces=[angle_diff * 0.5] * 2)
+
+
+    waypoint_index = 0
+    while waypoint_index < len(waypoints):
+        current_pos, _ = p.getBasePositionAndOrientation(robot_id)
+        
+        if np.linalg.norm(np.array(current_pos[:2]) - np.array(waypoints[waypoint_index][:2])) < 0.1:
+            waypoint_index += 1
+
+        if waypoint_index < len(waypoints):
+            move_robot_to_waypoint(robot_id, waypoints[waypoint_index])
+        
         p.stepSimulation()
         time.sleep(1./240.)
 
