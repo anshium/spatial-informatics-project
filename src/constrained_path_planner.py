@@ -231,19 +231,28 @@ def path_planner():
     print("Graph Created Successfully")
     
     
-    start_coordinates = (0, 0)
+    start_coordinates = (170, 60)
     end_coordinates = (555, 400)
-    avoid_point = (267, 38)
-    buffer_radius = 20
+    avoid_point = (267, 100)
+    buffer_radius = 60
 
     # Find the path
     cost, path = dtm_graph.dijkstra_with_near_avoid(start_coordinates, end_coordinates, avoid_point, buffer_radius)
 
     # Visualize the path
     path_x, path_y = zip(*path)
-    plt.imshow(img_cropped)
-    plt.plot(path_y, path_x, color='red', linewidth=2, marker='o', markersize=1)
-    plt.title("Shortest Path Avoiding Restricted Zone")
+    
+    fig, ax = plt.subplots()
+    ax.imshow(img_cropped)
+
+    # Draw the buffer zone around the avoid point
+    avoid_circle = plt.Circle((avoid_point[1], avoid_point[0]), buffer_radius, color='blue', fill=False, linewidth=2, linestyle='--')
+    ax.add_patch(avoid_circle)
+
+    # Plot the shortest path
+    ax.plot(path_y, path_x, color='red', linewidth=2, marker='o', markersize=1)
+
+    ax.set_title("Shortest Path with Buffer Zone")
     plt.show()
     
     

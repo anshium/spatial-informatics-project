@@ -234,8 +234,8 @@ def path_planner():
     print("Graph Created Successfully")
     
     
-    start_coordinates = (0, 0)
-    end_coordinates = (555, 555)
+    start_coordinates = (18,292)
+    end_coordinates = (327, 496)
     
     cost, path = dtm_graph.dijkstra(start_coordinates, end_coordinates)
     
@@ -245,7 +245,7 @@ def path_planner():
     
     plt.imshow(img_cropped)
     plt.plot(path_y, path_x, color='red', linewidth=2, marker='o', markersize=1)  # Draw the path
-    plt.title("Shortest Path on the Original Image")
+    plt.title("Optimised Path on the Original Image")
     plt.show()
     
     
