@@ -208,6 +208,8 @@ def three_d_viz():
         waypoints.append([path_point[0] / 100, path_point[1] / 100, 0.2])
         
     follow_waypoints(robot_id, waypoints)
+    
+    
 
 if __name__ == "__main__":
     three_d_viz()
