@@ -59,7 +59,7 @@ def follow_waypoints(robot_id, waypoints, step_size=0.05, threshold=0.1, z_offse
 
 
 
-def overlay_path(path, base_offset=0.2):
+def overlay_path(path, base_offset=0.1):
     for i in range(len(path) - 1):
         # Start and end points
         start = np.array([path[i][0], path[i][1], 0]) / 100
@@ -191,7 +191,7 @@ def three_d_viz():
     print("Here 5")
     print("Loaded urdf")
 
-    overlay_path(path)
+    # overlay_path(path)
 
     waypoints = list()
 

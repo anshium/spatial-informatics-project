@@ -11,7 +11,7 @@ Similar to Earth:
 ### Longitude
 - Measured eastward.
 - Prime meridian runs through a crater called Airy-0
-- Runs from [0 to 360 E)
+- Runs from [-180 to 180 E)
   
 ### Reference Systems and Elevation (Altitude)
 - "Datum" (or reference level) for altitude is based on Mars' aeroid, an imaginary surface of constant gravitational potential roughly analogous to the sea level on Earth.
